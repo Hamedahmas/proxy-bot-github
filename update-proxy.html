@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>تنظیم پروکسی برای ربات</title>
+</head>
+<body>
+  <h2>🔧 تغییر پروکسی ربات</h2>
+  <input type="text" id="proxy" placeholder="مثلاً socks5h://..." size="40"><br><br>
+  <input type="text" id="token" placeholder="GitHub Token" size="40"><br><br>
+  <input type="text" id="username" placeholder="GitHub Username" size="40"><br><br>
+  <button onclick="updateProxy()">ذخیره</button>
+  <p id="result"></p>
+
+  <script>
+    async function updateProxy() {
+      const proxy = document.getElementById("proxy").value;
+      const token = document.getElementById("token").value;
+      const username = document.getElementById("username").value;
+      const repo = "proxy-bot-github";
+      const filePath = "proxy.txt";
+
+      const url = `https://api.github.com/repos/${username}/${repo}/contents/${filePath}`;
+
+      const getRes = await fetch(url, {
+        headers: { Authorization: `token ${token}` }
+      });
+      const data = await getRes.json();
+
+      const res = await fetch(url, {
+        method: "PUT",
+        headers: {
+          Authorization: `token ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: "update proxy",
+          content: btoa(proxy),
+          sha: data.sha
+        })
+      });
+
+      if (res.ok) {
+        document.getElementById("result").innerText = "✅ پروکسی با موفقیت ذخیره شد.";
+      } else {
+        document.getElementById("result").innerText = "❌ خطا در ذخیره‌سازی.";
+      }
+    }
+  </script>
+</body>
+</html>
